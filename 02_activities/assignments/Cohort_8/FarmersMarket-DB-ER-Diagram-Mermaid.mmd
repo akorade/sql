@@ -1,0 +1,92 @@
+---
+config:
+  layout: elk
+---
+erDiagram
+  POSTAL_DATA ||--o{ CUSTOMER : "fk_postal_code → postal_code_3"
+  PRODUCT_CATEGORY ||--o{ PRODUCT : "fk_product_product_category1"
+  VENDOR ||--o{ VENDOR_INVENTORY : "fk_vendor_inventory_vendor1"
+  PRODUCT ||--o{ VENDOR_INVENTORY : "product_id (FK)"
+  MARKET_DATE_INFO ||--o{ VENDOR_INVENTORY : "market_date (PK part)"
+  VENDOR ||--o{ VENDOR_BOOTH_ASSIGNMENTS : "vendor_id_fk"
+  BOOTH  ||--o{ VENDOR_BOOTH_ASSIGNMENTS : "booth_number_fk"
+  MARKET_DATE_INFO ||--o{ VENDOR_BOOTH_ASSIGNMENTS : "market_date_fk"
+  CUSTOMER ||--o{ CUSTOMER_PURCHASES : "fk_customer_purchases_customer1"
+  VENDOR_INVENTORY ||--o{ CUSTOMER_PURCHASES : "fk_customer_purchases_vendor_inventory1"
+  BOOTH {
+    int booth_number PK
+    varchar booth_price_level
+    varchar booth_description
+    varchar booth_type
+  }
+  CUSTOMER {
+    int customer_id PK
+    nvarchar customer_first_name
+    nvarchar customer_last_name
+    char customer_postal_code FK
+  }
+  CUSTOMER_PURCHASES {
+    int product_id PK, FK
+    int vendor_id PK, FK
+    date market_date PK, FK
+    int customer_id PK, FK
+    time transaction_time PK
+    decimal quantity
+    decimal cost_to_customer_per_qty
+  }
+  MARKET_DATE_INFO {
+    date market_date PK
+    varchar market_day
+    varchar market_week
+    varchar market_year
+    varchar market_start_time
+    varchar market_end_time
+    blob special_notes
+    varchar market_season
+    varchar market_min_temp
+    varchar market_max_temp
+    int market_rain_flag
+    int market_snow_flag
+  }
+  POSTAL_DATA {
+    char postal_code_3 PK
+    nvarchar city
+    nvarchar district
+    int population
+    int median_household_income
+    float percent_under_14
+    float percent_over_65
+    int labour_force
+    float latitude
+    float longitude
+  }
+  PRODUCT {
+    int product_id PK
+    int product_category_id PK, FK
+    varchar product_name
+    varchar product_size
+    varchar product_qty_type
+  }
+  PRODUCT_CATEGORY {
+    int product_category_id PK
+    varchar product_category_name
+  }
+  VENDOR {
+    int vendor_id PK
+    varchar vendor_name
+    varchar vendor_type
+    varchar vendor_owner_first_name
+    varchar vendor_owner_last_name
+  }
+  VENDOR_BOOTH_ASSIGNMENTS {
+    int vendor_id PK, FK
+    int booth_number PK, FK
+    date market_date PK, FK
+  }
+  VENDOR_INVENTORY {
+    date market_date PK, FK
+    int vendor_id PK, FK
+    int product_id PK, FK
+    decimal quantity
+    decimal original_price
+  }
