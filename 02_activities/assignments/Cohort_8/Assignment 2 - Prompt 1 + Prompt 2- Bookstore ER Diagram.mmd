@@ -13,6 +13,10 @@ erDiagram
     BOOK ||--o{ INVENTORY_TRANSACTION : "movement"
     DATE_DIM ||--o{ INVENTORY_TRANSACTION : "txn date"
 
+    EMPLOYEE ||--o{ EMPLOYEE_SHIFT : "assigned"
+    SHIFT ||--o{ EMPLOYEE_SHIFT : "shift info"
+    DATE_DIM ||--o{ EMPLOYEE_SHIFT : "shift date"
+
     CUSTOMER {
         int      customer_id PK
         string   first_name
@@ -37,6 +41,22 @@ erDiagram
         string   email
         string   phone
         boolean  is_active
+    }
+
+    SHIFT {
+        int      shift_id PK
+        string   shift_name        "Morning, Evening"
+        time     start_time
+        time     end_time
+    }
+
+    EMPLOYEE_SHIFT {
+        int      emp_shift_id PK
+        int      employee_id FK
+        int      shift_id FK
+        int      date_key FK
+        boolean  is_confirmed
+        string   notes
     }
 
     "ORDER" {
