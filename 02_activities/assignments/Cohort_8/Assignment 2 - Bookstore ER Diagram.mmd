@@ -1,0 +1,124 @@
+erDiagram
+    CUSTOMER ||--o{ "ORDER" : places
+    EMPLOYEE ||--o{ "ORDER" : handles
+    "ORDER" ||--o{ SALES : contains
+    BOOK ||--o{ SALES : "sold in"
+    DATE_DIM ||--o{ "ORDER" : "order date"
+
+    BOOK_CATEGORY ||--o{ BOOK : "categorizes"
+
+    BOOK ||--o{ BOOK_SUPPLIER : "is supplied by"
+    SUPPLIER ||--o{ BOOK_SUPPLIER : "supplies"
+
+    BOOK ||--o{ INVENTORY_TRANSACTION : "movement"
+    DATE_DIM ||--o{ INVENTORY_TRANSACTION : "txn date"
+
+    CUSTOMER {
+        int      customer_id PK
+        string   first_name
+        string   last_name
+        string   email
+        string   phone
+        string   loyalty_number
+        string   address_line1
+        string   address_line2
+        string   city
+        string   province_state
+        string   postal_code
+        date     created_at
+    }
+
+    EMPLOYEE {
+        int      employee_id PK
+        string   first_name
+        string   last_name
+        string   role
+        date     hire_date
+        string   email
+        string   phone
+        boolean  is_active
+    }
+
+    "ORDER" {
+        int      order_id PK
+        int      customer_id FK
+        int      employee_id FK
+        int      order_date_key FK
+        string   order_status
+        string   payment_method
+        decimal  order_subtotal
+        decimal  order_tax
+        decimal  order_total
+    }
+
+    SALES {
+        int      sales_id PK
+        int      order_id FK
+        int      book_id FK
+        int      quantity
+        decimal  unit_price
+        decimal  discount_amount
+        decimal  line_total
+    }
+
+    BOOK {
+        int      book_id PK
+        string   isbn
+        string   title
+        string   author
+        int      category_id FK
+        decimal  list_price
+        date     published_date
+        boolean  is_active
+    }
+
+    BOOK_CATEGORY {
+        int      category_id PK
+        string   category_name
+        string   description
+    }
+
+    SUPPLIER {
+        int      supplier_id PK
+        string   supplier_name
+        string   contact_name
+        string   email
+        string   phone
+        string   address_line1
+        string   address_line2
+        string   city
+        string   province_state
+        string   postal_code
+    }
+
+    BOOK_SUPPLIER {
+        int      book_id FK
+        int      supplier_id FK
+        decimal  supplier_price
+        int      lead_time_days
+        boolean  is_primary
+    }
+
+    INVENTORY_TRANSACTION {
+        int      txn_id PK
+        int      book_id FK
+        int      date_key FK
+        string   txn_type        "RECEIPT, SALE, RETURN, ADJUSTMENT"
+        int      quantity_change  "positive or negative"
+        int      order_id FK      "for sales"
+        int      supplier_id FK   "for receipts (optional)"
+        string   notes
+    }
+
+    DATE_DIM {
+        int      date_key PK
+        date     full_date
+        int      year
+        int      quarter
+        int      month
+        string   month_name
+        int      day
+        string   day_name
+        boolean  is_weekend
+        boolean  is_holiday
+    }
