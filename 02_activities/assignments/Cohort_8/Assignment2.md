@@ -53,8 +53,41 @@ The store wants to keep customer addresses. Propose two architectures for the CU
 
 **HINT:** search type 1 vs type 2 slowly changing dimensions. 
 
-```
-Your answer...
+```sql
+/*
+TYPE 1 (Overwrite Changes)
+- Only one address per customer,
+*/
+CREATE TABLE CUSTOMER_ADDRESS (
+    customer_id        INTEGER PRIMARY KEY,
+    address_line1      TEXT NOT NULL,
+    address_line2      TEXT,
+    city               TEXT NOT NULL,
+    province_state     TEXT NOT NULL,
+    postal_code        TEXT NOT NULL,
+    country            TEXT NOT NULL,
+    last_updated_at    TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
+);
+
+/*
+TYPE 2 (Keep History)
+- One customer can have multiple address records over time.
+*/
+CREATE TABLE CUSTOMER_ADDRESS (
+    customer_address_id  INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id          INTEGER NOT NULL,
+    address_line1        TEXT NOT NULL,
+    address_line2        TEXT,
+    city                 TEXT NOT NULL,
+    province_state       TEXT NOT NULL,
+    postal_code          TEXT NOT NULL,
+    country              TEXT NOT NULL,
+    valid_from_date      TEXT NOT NULL,     -- ISO date like '2025-01-15'
+    valid_to_date        TEXT,              -- NULL means currently active
+    is_current           INTEGER NOT NULL DEFAULT 1, -- 1 = current, 0 = historical
+    FOREIGN KEY (customer_id) REFERENCES CUSTOMER(customer_id)
+);
 ```
 
 ***
