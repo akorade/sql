@@ -165,8 +165,24 @@ Remember, CROSS JOIN will explode your table rows, so CROSS JOIN should likely b
 Think a bit about the row counts: how many distinct vendors, product names are there (x)?
 How many customers are there (y). 
 Before your final group by you should have the product of those two queries (x*y).  */
-
-
+SELECT 
+    v.vendor_name,
+    p.product_name,
+    COUNT(*) * 5 * vi.original_price AS total_revenue
+FROM (
+SELECT DISTINCT 
+        vendor_id, 
+        product_id,
+        original_price
+    FROM vendor_inventory) AS vi
+CROSS JOIN (
+    -- Get all unique customers
+    SELECT DISTINCT customer_id
+    FROM customer
+) c
+INNER JOIN vendor v ON vi.vendor_id = v.vendor_id
+INNER JOIN product p ON vi.product_id = p.product_id
+GROUP BY v.vendor_name, p.product_name, vi.original_price;
 
 -- INSERT
 /*1.  Create a new table "product_units". 
