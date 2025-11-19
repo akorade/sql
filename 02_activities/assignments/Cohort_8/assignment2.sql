@@ -189,19 +189,25 @@ GROUP BY v.vendor_name, p.product_name, vi.original_price;
 This table will contain only products where the `product_qty_type = 'unit'`. 
 It should use all of the columns from the product table, as well as a new column for the `CURRENT_TIMESTAMP`.  
 Name the timestamp column `snapshot_timestamp`. */
-
-
+CREATE TABLE product_units AS
+SELECT 
+    product.*,
+    CURRENT_TIMESTAMP AS snapshot_timestamp
+FROM product
+WHERE product_qty_type = 'unit';
 
 /*2. Using `INSERT`, add a new row to the product_units table (with an updated timestamp). 
 This can be any product you desire (e.g. add another record for Apple Pie). */
-
+INSERT INTO product_units (product_id, product_name, product_size, product_category_id, product_qty_type, snapshot_timestamp)
+VALUES (9999, 'Test Product', '1 unit', 1, 'unit', CURRENT_TIMESTAMP);
 
 
 -- DELETE
 /* 1. Delete the older record for the whatever product you added. 
 
 HINT: If you don't specify a WHERE clause, you are going to have a bad time.*/
-
+DELETE FROM product_units
+WHERE product_id = 9999
 
 
 -- UPDATE
@@ -221,6 +227,25 @@ Finally, make sure you have a WHERE statement to update the right row,
 	you'll need to use product_units.product_id to refer to the correct row within the product_units table. 
 When you have all of these components, you can run the update statement. */
 
+ALTER TABLE product_units
+ADD current_quantity INT;
 
+WITH latest_inventory AS (
+    SELECT product_id,
+       quantity,
+       ROW_NUMBER() OVER (
+           PARTITION BY product_id
+           ORDER BY market_date DESC
+       ) AS rn
+FROM vendor_inventory)
+UPDATE product_units
+SET current_quantity = COALESCE((
+            SELECT vi.quantity
+            FROM latest_inventory vi
+            WHERE vi.product_id = product_units.product_id AND vi.rn = 1
+        ), 0);
+
+-- SELECT Statements for reference
+SELECT * FROM product_units;
 
 
