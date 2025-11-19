@@ -99,11 +99,7 @@ Hint: you might need to use INSTR(product_name,'-') to find the hyphens. INSTR w
 
 SELECT 
     product_name,
-    CASE 
-        WHEN INSTR(product_name, '-') > 0 
-        THEN TRIM(SUBSTR(product_name, INSTR(product_name, '-') + 1))
-        ELSE NULL
-    END AS description
+     TRIM(SUBSTR(product_name, NULLIF(INSTR(product_name, '-'), 0) + 1)) AS description
 FROM product;
 
 /* 2. Filter the query to show any product_size value that contain a number with REGEXP. */
@@ -168,7 +164,7 @@ Before your final group by you should have the product of those two queries (x*y
 SELECT 
     v.vendor_name,
     p.product_name,
-    COUNT(*) * 5 * vi.original_price AS total_revenue
+    customer_count * 5 * vi.original_price AS total_revenue
 FROM (
 SELECT DISTINCT 
         vendor_id, 
@@ -177,7 +173,7 @@ SELECT DISTINCT
     FROM vendor_inventory) AS vi
 CROSS JOIN (
     -- Get all unique customers
-    SELECT DISTINCT customer_id
+    SELECT COUNT(DISTINCT customer_id) as customer_count
     FROM customer
 ) c
 INNER JOIN vendor v ON vi.vendor_id = v.vendor_id
